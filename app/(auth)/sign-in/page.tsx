@@ -1,4 +1,4 @@
-import { getServerSession } from "@/lib/server-utis";
+import { getServerSession } from "@/lib/server-utils";
 import SignInView from "@/modules/auth/ui/views/sign-in-view";
 import { redirect } from "next/navigation";
 

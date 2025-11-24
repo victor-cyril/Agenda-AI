@@ -1,29 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import React from "react";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 
 const HomeView = () => {
-  const router = useRouter();
-  return (
-    <div>
-      <Button
-        onClick={async () =>
-          await authClient.signOut({
-            fetchOptions: {
-              onSuccess: () => {
-                router.push("/sign-in"); // redirect to login page
-              },
-            },
-          })
-        }
-      >
-        SignOut
-      </Button>
-    </div>
-  );
+  return <div></div>;
 };
 
 export default HomeView;

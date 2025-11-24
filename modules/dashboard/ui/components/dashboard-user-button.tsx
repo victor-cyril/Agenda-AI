@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import GeneratedAvatar from "@/components/ui/generated-avatar";
+import GeneratedAvatar from "@/components/generated-avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { authClient } from "@/lib/auth-client";
 import { ChevronDownIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
