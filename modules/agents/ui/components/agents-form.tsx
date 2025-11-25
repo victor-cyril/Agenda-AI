@@ -36,17 +36,37 @@ const AgentsForm = (props: Props) => {
           trpc.agents.getMany.queryOptions({})
         );
 
-        if (initialValues?.id) {
-          await queryClient.invalidateQueries(
-            trpc.agents.getOne.queryOptions({ id: initialValues.id })
-          );
-        }
+        // Invalidate free tier Usage
 
         toast.success("Agent created successfully");
         onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
+      },
+    })
+  );
+
+  const updateAgent = useMutation(
+    trpc.agents.update.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.agents.getMany.queryOptions({})
+        );
+
+        if (initialValues?.id) {
+          await queryClient.invalidateQueries(
+            trpc.agents.getOne.queryOptions({ id: initialValues.id })
+          );
+        }
+
+        toast.success("Agent Updated successfully");
+        onSuccess?.();
+      },
+      onError: (error) => {
+        toast.error(error.message);
+
+        // redirect to upgrade
       },
     })
   );
@@ -60,11 +80,11 @@ const AgentsForm = (props: Props) => {
   });
 
   const isEdit = !!initialValues?.id;
-  const isPending = createAgent.isPending;
+  const isPending = createAgent.isPending || updateAgent.isPending;
 
   const onSubmit = async (data: AgentInsertSchemaType) => {
     if (isEdit) {
-      console.log("Edit mode is not implemented yet");
+      updateAgent.mutate({ id: initialValues!.id, ...data });
       return;
     }
 

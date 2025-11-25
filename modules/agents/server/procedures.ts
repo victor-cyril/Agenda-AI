@@ -1,7 +1,7 @@
 import { db } from "@/database";
 import { agentTable } from "@/database/schemas";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { agentInsertSchema } from "../schemas";
+import { agentInsertSchema, agentUpdateSchema } from "../schemas";
 import { z } from "zod";
 import { and, desc, eq, getTableColumns, ilike, sql, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -101,6 +101,56 @@ export const agentsRouter = createTRPCRouter({
           userId: ctx.session.user.id,
         })
         .returning();
+
+      return data[0];
+    }),
+
+  remove: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const data = await db
+        .delete(agentTable)
+        .where(
+          and(
+            eq(agentTable.id, input.id),
+            eq(agentTable.userId, ctx.session.user.id)
+          )
+        )
+        .returning();
+
+      if (!data.length) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "Agent not found or you do not have permission to delete it.",
+        });
+      }
+
+      return true;
+    }),
+
+  update: protectedProcedure
+    .input(agentUpdateSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...updateData } = input;
+
+      const data = await db
+        .update(agentTable)
+        .set({
+          ...updateData,
+        })
+        .where(
+          and(eq(agentTable.id, id), eq(agentTable.userId, ctx.session.user.id))
+        )
+        .returning();
+
+      if (!data.length) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "Agent not found or you do not have permission to update it.",
+        });
+      }
 
       return data[0];
     }),

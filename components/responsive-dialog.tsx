@@ -7,6 +7,7 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/ui/credenza";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -37,7 +38,7 @@ const ResponsiveDialog = (props: Props) => {
     <Credenza open={open} onOpenChange={onOpenChange}>
       <CredenzaContent
         className={cn(
-          "md:max-w-[600px] mx-auto sm:rounded-2xl min-h-[300px] max-xs:mt-0!",
+          "md:max-w-[600px] mx-auto sm:rounded-2xl max-xs:mt-0!",
           classNames?.content
         )}
         overlayClassName={cn(
