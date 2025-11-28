@@ -125,7 +125,7 @@ const AgentsForm = (props: Props) => {
           name="instructions"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Instructions</FormLabel>
 
               <FormControl>
                 <Textarea
