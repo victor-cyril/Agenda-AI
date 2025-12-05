@@ -16,6 +16,7 @@ import MeetingIdViewHeader from "./meeting-id-view-header";
 import ActiveState from "../components/active-state";
 import CancelledState from "../components/cancelled-state";
 import ProcessingState from "../components/processing-state";
+import CompletedState from "../components/completed-state";
 
 type Props = {
   meetingId: string;
@@ -93,7 +94,7 @@ const MeetingIdView = (props: Props) => {
           />
         )}
 
-        {isCompleted && <div>Completed</div>}
+        {isCompleted && <CompletedState data={data} />}
         {isProcessing && <ProcessingState />}
       </div>
     </>

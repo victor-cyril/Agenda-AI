@@ -7,7 +7,6 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/ui/credenza";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -18,7 +17,7 @@ interface Props {
   onOpenChange?: (open: boolean) => void;
   classNames?: {
     content?: string;
-    overlayClassName?: string;
+    overlayclassname?: string;
   };
 }
 
@@ -41,9 +40,9 @@ const ResponsiveDialog = (props: Props) => {
           "md:max-w-[600px] mx-auto sm:rounded-2xl max-xs:mt-0!",
           classNames?.content
         )}
-        overlayClassName={cn(
+        overlayclassname={cn(
           "backdrop-blur-none",
-          classNames?.overlayClassName
+          classNames?.overlayclassname
         )}
       >
         <CredenzaHeader>

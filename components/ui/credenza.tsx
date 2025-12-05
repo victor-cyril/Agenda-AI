@@ -91,7 +91,7 @@ const CredenzaContent = ({
   children,
   ...props
 }: CredenzaProps & {
-  overlayClassName?: string;
+  overlayclassname?: string;
   showCloseButton?: boolean;
 }) => {
   const { isMobile } = useCredenzaContext();
