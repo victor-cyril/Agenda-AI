@@ -17,6 +17,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { agentInsertSchema, AgentInsertSchemaType } from "../../schemas";
 import { AgentGetOne } from "../../types";
+import { useRouter } from "next/navigation";
 
 type Props = {
   onSuccess?: () => void;
@@ -28,21 +29,29 @@ const AgentsForm = (props: Props) => {
   const { onSuccess, onCancel, initialValues } = props;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const createAgent = useMutation(
     trpc.agents.create.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          trpc.agents.getMany.queryOptions({})
-        );
-
-        // Invalidate free tier Usage
+        await Promise.all([
+          queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({})),
+          // Invalidate free tier Usage
+          queryClient.invalidateQueries(
+            trpc.premium.getFreeUsage.queryOptions()
+          ),
+        ]);
 
         toast.success("Agent created successfully");
         onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
+
+        if (error?.data?.code === "FORBIDDEN") {
+          // redirect to upgrade
+          router.push("/upgrade");
+        }
       },
     })
   );

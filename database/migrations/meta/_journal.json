@@ -22,6 +22,20 @@
       "when": 1764054847062,
       "tag": "0002_wide_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1764959101105,
+      "tag": "0003_vengeful_impossible_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764969138777,
+      "tag": "0004_narrow_ink",
+      "breakpoints": true
     }
   ]
 }

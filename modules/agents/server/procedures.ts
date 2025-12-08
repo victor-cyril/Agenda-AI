@@ -1,9 +1,13 @@
 import { db } from "@/database";
-import { agentTable } from "@/database/schemas";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+import { agentTable, meetingTable } from "@/database/schemas";
+import {
+  createTRPCRouter,
+  premiumProcedure,
+  protectedProcedure,
+} from "@/trpc/init";
 import { agentInsertSchema, agentUpdateSchema } from "../schemas";
 import { z } from "zod";
-import { and, desc, eq, getTableColumns, ilike, sql, count } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, ilike, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import {
   DEFAULT_PAGE,
@@ -20,7 +24,10 @@ export const agentsRouter = createTRPCRouter({
       const data = await db
         .select({
           ...getTableColumns(agentTable),
-          meetingCount: sql<number>`5`,
+          meetingCount: db.$count(
+            meetingTable,
+            eq(meetingTable.agentId, agentTable.id)
+          ),
         })
         .from(agentTable)
         .where(
@@ -60,7 +67,10 @@ export const agentsRouter = createTRPCRouter({
       const data = await db
         .select({
           ...getTableColumns(agentTable),
-          meetingCount: sql<number>`${5}`,
+          meetingCount: db.$count(
+            meetingTable,
+            eq(meetingTable.agentId, agentTable.id)
+          ),
         })
         .from(agentTable)
         .where(
@@ -91,7 +101,7 @@ export const agentsRouter = createTRPCRouter({
       return resultDto.toJSON();
     }),
 
-  create: protectedProcedure
+  create: premiumProcedure("agents")
     .input(agentInsertSchema)
     .mutation(async ({ input, ctx }) => {
       const data = await db

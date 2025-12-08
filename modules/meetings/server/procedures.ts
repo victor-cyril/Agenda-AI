@@ -7,7 +7,11 @@ import {
 import { db } from "@/database";
 import { agentTable, meetingTable, userTable } from "@/database/schemas";
 import { PaginationResultDto } from "@/lib/pagination-util";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+import {
+  createTRPCRouter,
+  premiumProcedure,
+  protectedProcedure,
+} from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import {
   and,
@@ -122,7 +126,7 @@ export const meetingsRouter = createTRPCRouter({
       return resultDto.toJSON();
     }),
 
-  create: protectedProcedure
+  create: premiumProcedure("meetings")
     .input(meetingInsertSchema)
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;

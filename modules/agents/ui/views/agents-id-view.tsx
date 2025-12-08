@@ -40,6 +40,9 @@ const AgentIdView = (props: Props) => {
         await Promise.all([
           queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({})),
           // Invalidate free tier Usage
+          queryClient.invalidateQueries(
+            trpc.premium.getFreeUsage.queryOptions()
+          ),
         ]);
 
         toast.success("Successfully deleted agent");

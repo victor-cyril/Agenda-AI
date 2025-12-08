@@ -1,0 +1,78 @@
+"use client";
+
+import { authClient } from "@/lib/auth-client";
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import React from "react";
+import PricingCard from "../components/pricing-card";
+
+const UpgradeView = () => {
+  const trpc = useTRPC();
+  const { data: products } = useSuspenseQuery(
+    trpc.premium.getProducts.queryOptions()
+  );
+  const { data: currentSubscriptionProduct } = useSuspenseQuery(
+    trpc.premium.getCurrentSubscriptionProduct.queryOptions()
+  );
+
+  return (
+    <div className="flex-1 p-4 md:px-8 flex flex-col gap-y-10">
+      <div className="mt-4 flex-1 flex-col flex gap-y-10 items-center">
+        <h5 className="font-medium text-2xl md:text-3xl">
+          You are on the{" "}
+          <span className="font-semibold text-primary">
+            {currentSubscriptionProduct?.name || "Free"}
+          </span>{" "}
+          plan.
+        </h5>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {products.map((product) => {
+            const isCurrentProduct =
+              currentSubscriptionProduct?.id === product.id;
+            const isPremium = !!currentSubscriptionProduct;
+            const price = product.prices[0];
+
+            let buttonText = "Upgrade";
+            let onClick = () => authClient.checkout({ products: [product.id] });
+
+            if (isCurrentProduct) {
+              buttonText = "Manage";
+              onClick = () => authClient.customer.portal();
+            } else if (isPremium) {
+              buttonText = "Change Plan";
+              onClick = () => authClient.customer.portal();
+            }
+
+            return (
+              <PricingCard
+                key={product.id}
+                buttonText={buttonText}
+                onClick={onClick}
+                variant={
+                  product.metadata.variant === "highlighted"
+                    ? "highlighted"
+                    : "default"
+                }
+                title={product.name}
+                price={
+                  price.amountType === "fixed"
+                    ? price.priceAmount / 100 // price is stored in cents
+                    : 0
+                }
+                description={product.description}
+                priceSuffix={`/${price.recurringInterval}`}
+                features={product.benefits.map(
+                  (benefit) => benefit.description
+                )}
+                badge={product.metadata.badge as string | null}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UpgradeView;

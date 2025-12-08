@@ -20,6 +20,7 @@ import { useState } from "react";
 import CommandSelect from "@/components/command-select";
 import GeneratedAvatar from "@/components/generated-avatar";
 import NewAgentDialog from "@/modules/agents/ui/components/new-agent-dialog";
+import { useRouter } from "next/navigation";
 
 type Props = {
   onSuccess?: (id?: string) => void;
@@ -31,6 +32,7 @@ const MeetingsForm = (props: Props) => {
   const { onSuccess, onCancel, initialValues } = props;
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [openAgentDialog, setOpenAgentDialog] = useState(false);
   const [agentSearch, setAgentSearch] = useState("");
@@ -55,9 +57,12 @@ const MeetingsForm = (props: Props) => {
   const createMeeting = useMutation(
     trpc.meetings.create.mutationOptions({
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries(
-          trpc.meetings.getMany.queryOptions({})
-        );
+        await Promise.all([
+          queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({})),
+          queryClient.invalidateQueries(
+            trpc.premium.getFreeUsage.queryOptions()
+          ),
+        ]);
 
         // Invalidate free tier Usage
 
@@ -66,6 +71,10 @@ const MeetingsForm = (props: Props) => {
       },
       onError: (error) => {
         toast.error(error.message);
+
+        if (error?.data?.code === "FORBIDDEN") {
+          router.push("/upgrade");
+        }
       },
     })
   );
@@ -73,15 +82,16 @@ const MeetingsForm = (props: Props) => {
   const updateMeeting = useMutation(
     trpc.meetings.update.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          trpc.meetings.getMany.queryOptions({})
-        );
-
-        if (initialValues?.id) {
-          await queryClient.invalidateQueries(
-            trpc.meetings.getOne.queryOptions({ id: initialValues.id })
-          );
-        }
+        await Promise.all([
+          queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({})),
+          ...(initialValues?.id
+            ? [
+                queryClient.invalidateQueries(
+                  trpc.meetings.getOne.queryOptions({ id: initialValues.id })
+                ),
+              ]
+            : []),
+        ]);
 
         toast.success("Meeting Updated successfully");
         onSuccess?.();
@@ -89,7 +99,10 @@ const MeetingsForm = (props: Props) => {
       onError: (error) => {
         toast.error(error.message);
 
-        // redirect to upgrade
+        if (error?.data?.code === "FORBIDDEN") {
+          // redirect to upgrade
+          router.push("/upgrade");
+        }
       },
     })
   );

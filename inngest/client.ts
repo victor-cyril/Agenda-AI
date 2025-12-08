@@ -6,4 +6,5 @@ export const inngest = new Inngest({ id: "agenda-ai" });
 export const INNGEST_EVENTS = {
   PERSIST_AGENT_CONNECTION: "persist-agent-connection",
   MEETINGS_PROCESSING: "meetings/processing",
+  NEW_CHAT_MESSAGE: "meetings/new-chat-message",
 };

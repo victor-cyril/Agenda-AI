@@ -22,7 +22,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { authClient } from "@/lib/auth-client";
 import { ChevronDownIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 const DashboardUserButton = () => {
   const { data: session, isPending } = authClient.useSession();
@@ -55,7 +54,10 @@ const DashboardUserButton = () => {
           </DrawerHeader>
 
           <DrawerFooter>
-            <Button variant={"outline"} onClick={() => {}}>
+            <Button
+              variant={"outline"}
+              onClick={() => authClient.customer.portal()}
+            >
               <CreditCardIcon className="size-4 text-black" />
               Billing
             </Button>
@@ -87,7 +89,10 @@ const DashboardUserButton = () => {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer flex items-center justify-between">
+        <DropdownMenuItem
+          className="cursor-pointer flex items-center justify-between"
+          onClick={() => authClient.customer.portal()}
+        >
           Billing
           <CreditCardIcon className="size-4" />
         </DropdownMenuItem>
